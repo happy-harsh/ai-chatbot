@@ -1,0 +1,79 @@
+import express from "express";
+import cors from "cors";
+import multer from "multer";
+import authRoutes, { registerRouter } from "./routes/auth.routes";
+import userRoutes from "./routes/user.routes";
+import messageRoutes from "./routes/messages.routes";
+import connectDB from "./config/connection";
+import dotenv from "dotenv";
+import { readTextFile, splitChunk, storeDocuments } from "./utils/helpers";
+import { extractTextFromBuffer } from "./utils/doc-parser";
+
+import dns from "dns";
+dns.setDefaultResultOrder("ipv4first");
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
+dotenv.config();
+connectDB();
+
+export const app = express();
+const upload = multer({ storage: multer.memoryStorage() });
+
+app.use(cors());
+app.use(express.json());
+
+// Routes
+app.use("/login", authRoutes);
+app.use("/register", registerRouter);
+app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
+app.use("/messages", messageRoutes);
+
+// Dynamic Document Upload Endpoint for RAG (Supports .txt, .pdf, .docx, .pptx, etc.)
+app.post("/upload-document", upload.single("file"), async (req: any, res: any) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    console.log(`📄 Received file upload: ${req.file.originalname} (${req.file.size} bytes)`);
+
+    const extractedText = await extractTextFromBuffer(
+      req.file.buffer,
+      req.file.originalname
+    );
+
+    if (!extractedText || extractedText.trim().length === 0) {
+      return res.status(400).json({ error: "Could not extract text from document" });
+    }
+
+    const chunks = splitChunk(extractedText);
+    console.log(`Extracted ${extractedText.length} chars, created ${chunks.length} chunks.`);
+
+    await storeDocuments(chunks);
+
+    return res.json({
+      success: true,
+      message: `Successfully indexed "${req.file.originalname}" into Pinecone!`,
+      filename: req.file.originalname,
+      chunksCount: chunks.length,
+    });
+  } catch (error: any) {
+    console.error("Document upload error:", error);
+    return res.status(500).json({ error: error.message || "Failed to process document" });
+  }
+});
+
+app.post("/upload", async (req, res) => {
+  try {
+    const text = readTextFile("knowledge_base.txt");
+    console.log(text, "text");
+    const chunks = splitChunk(text);
+    console.log(chunks, "chunks");
+    console.log("Chunks:", chunks.length);
+    await storeDocuments(chunks);
+    res.json({ success: true });
+  } catch (error) {
+    console.log(error);
+  }
+});

@@ -1,0 +1,36 @@
+User Profile –  Savan Fami
+
+1. Basic Information
+
+* Preferred Name: Savan Fami
+* Role/Profession: Software Engineer
+* Location (approximate): Mumbai, India
+* Age : 26
+
+2. Technical Expertise & Interests
+
+* MERN stack development
+* NestJS, Socket.IO, Redis, BullMQ (real-time multi-server chat systems)
+* LangChain learning & AI model fine-tuning
+* Razorpay subscription/webhook automation
+* PostgreSQL and general backend engineering
+
+3. Projects & Work
+
+* Building scalable real-time chat applications ("Converse")
+* Implemented message info and online notifications systems
+* Worked on automated subscription and invoice systems with NestJS and Razorpay
+* Experiments with LLM benchmarking and reasoning tasks
+
+4. Preferences & Style
+
+* Forward-thinking and solution-oriented
+* Prefers precise, step-by-step reasoning for problem-solving
+* Enjoys structured and well-documented code
+* Likes responses to be honest, clear, and detailed
+
+5. Learning & Development Goals
+
+* Expanding knowledge in AI agents and LangChain
+* Improving real-time systems design and observability
+* Enhancing full-stack application performance and reliability
