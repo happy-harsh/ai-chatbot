@@ -52,18 +52,63 @@ export const index = pinecone.index(
   process.env.PINECONE_INDEX_NAME || "ai-chatbot"
 );
 
-export async function storeDocuments(docs: string[]) {
+export async function clearAllDocuments() {
+  try {
+    const stats = await index.describeIndexStats();
+    if (!stats.totalRecordCount || stats.totalRecordCount === 0) {
+      console.log("ℹ️ Pinecone index is already completely empty (0 records).");
+      return { success: true, count: 0 };
+    }
+    await index.deleteAll();
+    console.log("🧹 Successfully wiped all vectors from Pinecone index.");
+    return { success: true };
+  } catch (err: any) {
+    if (
+      err?.name === "PineconeNotFoundError" ||
+      err?.status === 404 ||
+      err?.message?.includes("404")
+    ) {
+      console.log("ℹ️ Pinecone index has no records to delete (404 handled).");
+      return { success: true, count: 0 };
+    }
+    console.error("Error wiping Pinecone documents:", err);
+    throw err;
+  }
+}
+
+export async function storeDocuments(
+  docs: string[],
+  metadata?: {
+    documentName?: string;
+    userId?: string;
+    clearPrevious?: boolean;
+  }
+) {
   const validDocs = docs.map((d) => d.trim()).filter(Boolean);
 
   if (!validDocs.length) {
     throw new Error("No valid docs");
   }
 
-  console.log(`Generating 1024-dim embeddings for ${validDocs.length} chunks via ${EMBEDDING_MODEL}...`);
+  // If clearPrevious is requested (e.g. ChatGPT-style fresh document context), wipe older vectors safely
+  if (metadata?.clearPrevious) {
+    try {
+      console.log("🧹 Clearing previous Pinecone vectors for clean document context...");
+      await clearAllDocuments();
+    } catch (cleanErr) {
+      console.warn("Notice while clearing previous vectors:", cleanErr);
+    }
+  }
+
+  console.log(
+    `Generating 1024-dim embeddings for ${validDocs.length} chunks via ${EMBEDDING_MODEL} (Doc: "${metadata?.documentName || "Unknown"}")...`
+  );
 
   const BATCH_SIZE = 64; // Pinecone supports batch embedding
   const vectors: any[] = [];
   const timestamp = Date.now();
+  const docName = metadata?.documentName || "Uploaded Document";
+  const userId = metadata?.userId || "";
 
   for (let i = 0; i < validDocs.length; i += BATCH_SIZE) {
     const chunkBatch = validDocs.slice(i, i + BATCH_SIZE);
@@ -74,12 +119,19 @@ export async function storeDocuments(docs: string[]) {
       vectors.push({
         id: `doc-${timestamp}-${Math.random().toString(36).substring(2, 7)}-${globalIdx}`,
         values: embeddings[batchIdx],
-        metadata: { text: doc },
+        metadata: {
+          text: doc,
+          documentName: docName,
+          userId,
+          timestamp,
+        },
       });
     });
   }
 
-  console.log(`Vectors created with dimension ${vectors[0]?.values?.length || 0}: ${vectors.length}`);
+  console.log(
+    `Vectors created with dimension ${vectors[0]?.values?.length || 0}: ${vectors.length}`
+  );
 
   if (!vectors.length) {
     throw new Error("No vectors created");
@@ -92,17 +144,41 @@ export async function storeDocuments(docs: string[]) {
   }
 }
 
-export async function searchRelevantDocs(query: string) {
+export async function searchRelevantDocs(
+  query: string,
+  options?: { documentName?: string; userId?: string }
+) {
   try {
     const embedding = await getEmbedding(query, "query");
 
-    const result = await index.query({
+    const queryPayload: any = {
       vector: embedding,
-      topK: 5,
+      topK: 6,
       includeMetadata: true,
-    });
+    };
 
-    return result.matches.map((m: any) => m.metadata?.text || "").filter(Boolean);
+    if (options?.documentName) {
+      queryPayload.filter = {
+        documentName: { $eq: options.documentName },
+      };
+    }
+
+    let result = await index.query(queryPayload);
+
+    // If a document filter was applied but yielded 0 matches (e.g. subtle naming difference),
+    // fallback to querying without the filter
+    if (options?.documentName && (!result.matches || result.matches.length === 0)) {
+      console.log(`Document filter for "${options.documentName}" returned 0 matches; querying all vectors.`);
+      result = await index.query({
+        vector: embedding,
+        topK: 6,
+        includeMetadata: true,
+      });
+    }
+
+    return (result.matches || [])
+      .map((m: any) => m.metadata?.text || "")
+      .filter(Boolean);
   } catch (err) {
     console.error("Error searching relevant docs:", err);
     return [];

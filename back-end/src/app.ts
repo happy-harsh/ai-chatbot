@@ -6,7 +6,7 @@ import userRoutes from "./routes/user.routes";
 import messageRoutes from "./routes/messages.routes";
 import connectDB from "./config/connection";
 import dotenv from "dotenv";
-import { readTextFile, splitChunk, storeDocuments } from "./utils/helpers";
+import { clearAllDocuments, readTextFile, splitChunk, storeDocuments } from "./utils/helpers";
 import { extractTextFromBuffer } from "./utils/doc-parser";
 
 import dns from "dns";
@@ -50,17 +50,41 @@ app.post("/upload-document", upload.single("file"), async (req: any, res: any) =
     const chunks = splitChunk(extractedText);
     console.log(`Extracted ${extractedText.length} chars, created ${chunks.length} chunks.`);
 
-    await storeDocuments(chunks);
+    // Tag chunks with documentName and clear out any old un-associated vectors
+    const documentName = req.file.originalname;
+    const userId = req.body?.userId || "";
+
+    await storeDocuments(chunks, {
+      documentName,
+      userId,
+      clearPrevious: true,
+    });
 
     return res.json({
       success: true,
-      message: `Successfully indexed "${req.file.originalname}" into Pinecone!`,
-      filename: req.file.originalname,
+      message: `Successfully indexed "${documentName}" into Pinecone!`,
+      filename: documentName,
       chunksCount: chunks.length,
     });
   } catch (error: any) {
     console.error("Document upload error:", error);
     return res.status(500).json({ error: error.message || "Failed to process document" });
+  }
+});
+
+// Wipe all Pinecone vectors endpoint (used by Settings Modal)
+app.delete("/documents/clear-all", async (req: any, res: any) => {
+  try {
+    await clearAllDocuments();
+    return res.json({
+      success: true,
+      message: "Successfully cleared all documents from Pinecone knowledge base",
+    });
+  } catch (err: any) {
+    console.error("Error clearing documents:", err);
+    return res.status(500).json({
+      error: err?.message || "Failed to clear documents from Pinecone",
+    });
   }
 });
 

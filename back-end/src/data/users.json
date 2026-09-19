@@ -10,53 +10,5 @@
     "username": "harsh",
     "password": "1",
     "displayName": "HARSH"
-  },
-  {
-    "id": "u3",
-    "username": "serena",
-    "password": "ser",
-    "displayName": "serena"
-  },
-  {
-    "id": "u4",
-    "username": "akshay",
-    "password": "1",
-    "displayName": "akshay"
-  },
-  {
-    "id": "u5",
-    "username": "emma",
-    "password": "emma123",
-    "displayName": "Emma Wilson"
-  },
-  {
-    "id": "u6",
-    "username": "fiona",
-    "password": "fiona123",
-    "displayName": "Fiona Davis"
-  },
-  {
-    "id": "u7",
-    "username": "george",
-    "password": "george123",
-    "displayName": "George Taylor"
-  },
-  {
-    "id": "u8",
-    "username": "henry",
-    "password": "henry123",
-    "displayName": "Henry Anderson"
-  },
-  {
-    "id": "u9",
-    "username": "irene",
-    "password": "irene123",
-    "displayName": "Irene Thomas"
-  },
-  {
-    "id": "u10",
-    "username": "jack",
-    "password": "jack123",
-    "displayName": "Jack White"
   }
 ]

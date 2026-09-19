@@ -1,6 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+import {
+  Bot,
+  Lock,
+  User,
+  Sparkles,
+  ArrowRight,
+  ShieldCheck,
+  Zap,
+  Users,
+  AlertCircle,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
@@ -10,25 +23,54 @@ export const Login = ({ setCurrentUser, setSocket }) => {
   const [displayName, setDisplayName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [focusedField, setFocusedField] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showDemoUsers, setShowDemoUsers] = useState(false);
 
   const navigate = useNavigate();
 
   const demoAccounts = [
-    { username: "harsh", password: "1", label: "HARSH" },
-    { username: "savan", password: "1", label: "SAVAN" },
-    { username: "serena", password: "ser", label: "Serena" },
-    { username: "akshay", password: "1", label: "Akshay" },
+    { username: "harsh", password: "1", label: "Harsh" },
+    { username: "savan", password: "1", label: "Savan" },
   ];
 
-  const fillDemo = (acc) => {
+  const handleDemoLogin = async (acc) => {
     setIsRegister(false);
     setUsername(acc.username);
     setPassword(acc.password);
     setError("");
+
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: acc.username,
+          password: acc.password,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.message || "Failed to sign in.");
+        setLoading(false);
+        return;
+      }
+
+      const newSocket = io(API_URL);
+      newSocket.emit("join", data.user.id);
+
+      localStorage.setItem("chat_user", JSON.stringify(data.user));
+      setCurrentUser(data.user);
+      setSocket(newSocket);
+      navigate("/chat");
+    } catch (err) {
+      console.error("Demo login error:", err);
+      setError("Unable to connect to backend server.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogin = async (e) => {
@@ -61,6 +103,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
       const newSocket = io(API_URL);
       newSocket.emit("join", data.user.id);
 
+      localStorage.setItem("chat_user", JSON.stringify(data.user));
       setCurrentUser(data.user);
       setSocket(newSocket);
       navigate("/chat");
@@ -83,11 +126,6 @@ export const Login = ({ setCurrentUser, setSocket }) => {
 
     if (!password) {
       setError("Please enter a password.");
-      return;
-    }
-
-    if (password.length < 1) {
-      setError("Password cannot be empty.");
       return;
     }
 
@@ -115,10 +153,10 @@ export const Login = ({ setCurrentUser, setSocket }) => {
         return;
       }
 
-      // Auto sign-in on registration success
       const newSocket = io(API_URL);
       newSocket.emit("join", data.user.id);
 
+      localStorage.setItem("chat_user", JSON.stringify(data.user));
       setCurrentUser(data.user);
       setSocket(newSocket);
       navigate("/chat");
@@ -130,466 +168,466 @@ export const Login = ({ setCurrentUser, setSocket }) => {
     }
   };
 
-  const toggleMode = (registerMode) => {
-    setIsRegister(registerMode);
-    setError("");
-  };
-
   return (
-    <div style={styles.page}>
-      <div style={styles.backgroundShapes}>
-        <div style={styles.shape1}></div>
-        <div style={styles.shape2}></div>
-        <div style={styles.shape3}></div>
-      </div>
+    <div
+      style={{
+        minHeight: "100vh",
+        width: "100vw",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#09090b",
+        backgroundImage: `
+          radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
+          radial-gradient(circle at 80% 80%, rgba(5, 150, 105, 0.08) 0%, transparent 50%)
+        `,
+        fontFamily:
+          "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        color: "#f8fafc",
+        padding: "20px",
+        boxSizing: "border-box",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 440,
+          background: "#111413",
+          border: "1px solid #1e2e26",
+          borderRadius: 20,
+          boxShadow:
+            "0 20px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(16, 185, 129, 0.08)",
+          padding: "36px 32px",
+          boxSizing: "border-box",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Ambient Top Glow Line */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: "15%",
+            right: "15%",
+            height: 2,
+            background:
+              "linear-gradient(90deg, transparent, #10b981, transparent)",
+          }}
+        />
 
-      <div style={styles.card}>
-        <div style={styles.iconWrapper}>
-          <div style={styles.icon}>
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
+        {/* Brand Header */}
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
+          <div
+            style={{
+              width: 58,
+              height: 58,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #10b981, #059669)",
+              color: "#ffffff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 16px",
+              boxShadow: "0 8px 24px rgba(16, 185, 129, 0.35)",
+            }}
+          >
+            <Bot size={30} />
           </div>
+          <h1
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: "#f8fafc",
+              margin: "0 0 6px",
+              letterSpacing: "-0.02em",
+            }}
+          >
+            AI Chatbot Workspace
+          </h1>
+          <p
+            style={{
+              fontSize: 13,
+              color: "#94a3b8",
+              margin: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+            }}
+          >
+            <Sparkles size={14} color="#10b981" />
+            <span>Voice & Document Intelligence</span>
+          </p>
         </div>
 
-        <h2 style={styles.title}>
-          {isRegister ? "Create an Account" : "Welcome Back"}
-        </h2>
-        <p style={styles.subtitle}>
-          {isRegister
-            ? "Register a new user to start chatting"
-            : "Sign in to continue to your account"}
-        </p>
-
-        {/* Tab switcher */}
-        <div style={styles.tabContainer}>
+        {/* Tab Switcher */}
+        <div
+          style={{
+            display: "flex",
+            background: "#090d0b",
+            border: "1px solid #1b2821",
+            borderRadius: 12,
+            padding: 4,
+            marginBottom: 24,
+          }}
+        >
           <button
             type="button"
-            style={{
-              ...styles.tabBtn,
-              ...(!isRegister ? styles.tabBtnActive : {}),
+            onClick={() => {
+              setIsRegister(false);
+              setError("");
             }}
-            onClick={() => toggleMode(false)}
+            style={{
+              flex: 1,
+              padding: "9px 0",
+              borderRadius: 9,
+              border: "none",
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              background: !isRegister ? "#10b981" : "transparent",
+              color: !isRegister ? "#022c22" : "#94a3b8",
+              boxShadow: !isRegister
+                ? "0 2px 10px rgba(16, 185, 129, 0.3)"
+                : "none",
+            }}
           >
             Sign In
           </button>
           <button
             type="button"
-            style={{
-              ...styles.tabBtn,
-              ...(isRegister ? styles.tabBtnActive : {}),
+            onClick={() => {
+              setIsRegister(true);
+              setError("");
             }}
-            onClick={() => toggleMode(true)}
+            style={{
+              flex: 1,
+              padding: "9px 0",
+              borderRadius: 9,
+              border: "none",
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              background: isRegister ? "#10b981" : "transparent",
+              color: isRegister ? "#022c22" : "#94a3b8",
+              boxShadow: isRegister
+                ? "0 2px 10px rgba(16, 185, 129, 0.3)"
+                : "none",
+            }}
           >
-            Sign Up
+            Create Account
           </button>
         </div>
 
-        {error && <div style={styles.errorBanner}>{error}</div>}
-
-        <form
-          onSubmit={isRegister ? handleRegister : handleLogin}
-          style={styles.form}
-        >
-          <div style={styles.inputWrapper}>
-            <input
-              style={{
-                ...styles.input,
-                ...(focusedField === "username" ? styles.inputFocused : {}),
-              }}
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              onFocus={() => setFocusedField("username")}
-              onBlur={() => setFocusedField(null)}
-              autoComplete="username"
-              required
-            />
+        {/* Error Alert */}
+        {error && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "10px 14px",
+              borderRadius: 10,
+              background: "#450a0a",
+              border: "1px solid #7f1d1d",
+              color: "#fca5a5",
+              fontSize: 12,
+              fontWeight: 600,
+              marginBottom: 20,
+            }}
+          >
+            <AlertCircle size={16} style={{ flexShrink: 0 }} />
+            <span>{error}</span>
           </div>
+        )}
 
+        {/* Form */}
+        <form onSubmit={isRegister ? handleRegister : handleLogin}>
           {isRegister && (
-            <div style={styles.inputWrapper}>
-              <input
+            <div style={{ marginBottom: 16 }}>
+              <label
                 style={{
-                  ...styles.input,
-                  ...(focusedField === "displayName" ? styles.inputFocused : {}),
+                  display: "block",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#cbd5e1",
+                  marginBottom: 6,
                 }}
-                placeholder="Display Name (optional)"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                onFocus={() => setFocusedField("displayName")}
-                onBlur={() => setFocusedField(null)}
-              />
+              >
+                Display Name (Optional)
+              </label>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  background: "#090d0b",
+                  border: "1px solid #1f2d26",
+                  borderRadius: 10,
+                  padding: "10px 12px",
+                }}
+              >
+                <User size={16} color="#10b981" />
+                <input
+                  type="text"
+                  placeholder="e.g. Harsh Dodiya"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  style={{
+                    flex: 1,
+                    border: "none",
+                    background: "transparent",
+                    outline: "none",
+                    color: "#f8fafc",
+                    fontSize: 14,
+                  }}
+                />
+              </div>
             </div>
           )}
 
-          <div style={styles.inputWrapper}>
-            <input
+          <div style={{ marginBottom: 16 }}>
+            <label
               style={{
-                ...styles.input,
-                ...(focusedField === "password" ? styles.inputFocused : {}),
+                display: "block",
+                fontSize: 12,
+                fontWeight: 600,
+                color: "#cbd5e1",
+                marginBottom: 6,
               }}
-              placeholder="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onFocus={() => setFocusedField("password")}
-              onBlur={() => setFocusedField(null)}
-              autoComplete={isRegister ? "new-password" : "current-password"}
-              required
-            />
+            >
+              Username
+            </label>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                background: "#090d0b",
+                border: "1px solid #1f2d26",
+                borderRadius: 10,
+                padding: "10px 12px",
+              }}
+            >
+              <User size={16} color="#10b981" />
+              <input
+                type="text"
+                placeholder="Enter username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoCapitalize="none"
+                style={{
+                  flex: 1,
+                  border: "none",
+                  background: "transparent",
+                  outline: "none",
+                  color: "#f8fafc",
+                  fontSize: 14,
+                }}
+              />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: isRegister ? 16 : 24 }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: 12,
+                fontWeight: 600,
+                color: "#cbd5e1",
+                marginBottom: 6,
+              }}
+            >
+              Password
+            </label>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                background: "#090d0b",
+                border: "1px solid #1f2d26",
+                borderRadius: 10,
+                padding: "10px 12px",
+              }}
+            >
+              <Lock size={16} color="#10b981" />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{
+                  flex: 1,
+                  border: "none",
+                  background: "transparent",
+                  outline: "none",
+                  color: "#f8fafc",
+                  fontSize: 14,
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  border: "none",
+                  background: "transparent",
+                  color: "#64748b",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: 0,
+                }}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
           {isRegister && (
-            <div style={styles.inputWrapper}>
-              <input
+            <div style={{ marginBottom: 24 }}>
+              <label
                 style={{
-                  ...styles.input,
-                  ...(focusedField === "confirmPassword"
-                    ? styles.inputFocused
-                    : {}),
+                  display: "block",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#cbd5e1",
+                  marginBottom: 6,
                 }}
-                placeholder="Confirm Password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                onFocus={() => setFocusedField("confirmPassword")}
-                onBlur={() => setFocusedField(null)}
-                autoComplete="new-password"
-                required
-              />
+              >
+                Confirm Password
+              </label>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  background: "#090d0b",
+                  border: "1px solid #1f2d26",
+                  borderRadius: 10,
+                  padding: "10px 12px",
+                }}
+              >
+                <ShieldCheck size={16} color="#10b981" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Repeat password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  style={{
+                    flex: 1,
+                    border: "none",
+                    background: "transparent",
+                    outline: "none",
+                    color: "#f8fafc",
+                    fontSize: 14,
+                  }}
+                />
+              </div>
             </div>
           )}
 
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
             style={{
-              ...styles.button,
-              opacity: loading ? 0.7 : 1,
+              width: "100%",
+              padding: "12px",
+              borderRadius: 10,
+              border: "none",
+              background: "linear-gradient(135deg, #10b981, #059669)",
+              color: "#022c22",
+              fontSize: 14,
+              fontWeight: 800,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
               cursor: loading ? "not-allowed" : "pointer",
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) {
-                e.target.style.transform = "translateY(-2px)";
-                e.target.style.boxShadow =
-                  "0 8px 20px rgba(102, 126, 234, 0.4)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = "translateY(0)";
-              e.target.style.boxShadow =
-                "0 4px 12px rgba(102, 126, 234, 0.3)";
+              boxShadow: "0 4px 18px rgba(16, 185, 129, 0.4)",
+              transition: "transform 0.15s ease",
             }}
           >
-            {loading
-              ? isRegister
-                ? "Creating Account..."
-                : "Signing In..."
-              : isRegister
-              ? "Create Account"
-              : "Sign In"}
+            {loading ? (
+              <span>Please wait...</span>
+            ) : (
+              <>
+                <span>{isRegister ? "Create Account" : "Sign In to Chat"}</span>
+                <ArrowRight size={16} />
+              </>
+            )}
           </button>
         </form>
 
-        <div style={styles.footer}>
-          {isRegister ? (
-            <p style={styles.footerText}>
-              Already have an account?{" "}
-              <span
-                style={styles.link}
-                onClick={() => toggleMode(false)}
-                role="button"
-                tabIndex={0}
-              >
-                Sign In
-              </span>
-            </p>
-          ) : (
-            <p style={styles.footerText}>
-              Don't have an account?{" "}
-              <span
-                style={styles.link}
-                onClick={() => toggleMode(true)}
-                role="button"
-                tabIndex={0}
-              >
-                Create one
-              </span>
-            </p>
-          )}
-        </div>
-
-        {/* Demo Accounts Helper */}
-        <div style={styles.demoSection}>
-          <button
-            type="button"
-            style={styles.demoToggle}
-            onClick={() => setShowDemoUsers(!showDemoUsers)}
-          >
-            {showDemoUsers ? "▲ Hide Demo Accounts" : "▼ Quick Demo Accounts"}
-          </button>
-          {showDemoUsers && (
-            <div style={styles.demoList}>
+        {/* Demo Fast Login Chips */}
+        {!isRegister && (
+          <div style={{ marginTop: 28, paddingTop: 20, borderTop: "1px solid #1b2821" }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                color: "#64748b",
+                marginBottom: 10,
+                textAlign: "center",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+              }}
+            >
+              <Zap size={12} color="#10b981" />
+              <span>1-Click Demo Accounts</span>
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 8,
+              }}
+            >
               {demoAccounts.map((acc) => (
                 <button
                   key={acc.username}
                   type="button"
-                  style={styles.demoChip}
-                  onClick={() => fillDemo(acc)}
-                  title={`Username: ${acc.username} | Password: ${acc.password}`}
+                  onClick={() => handleDemoLogin(acc)}
+                  style={{
+                    padding: "8px 10px",
+                    borderRadius: 8,
+                    border: "1px solid #1e2e26",
+                    background: "#090d0b",
+                    color: "#a7f3d0",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
+                    transition: "all 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "#10b981";
+                    e.currentTarget.style.background = "#052e16";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "#1e2e26";
+                    e.currentTarget.style.background = "#090d0b";
+                  }}
                 >
-                  <strong>{acc.label}</strong> ({acc.username})
+                  <Users size={12} color="#10b981" />
+                  <span>{acc.label}</span>
                 </button>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
-const styles = {
-  page: {
-    minHeight: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-    position: "relative",
-    overflow: "hidden",
-    padding: "20px",
-    boxSizing: "border-box",
-  },
-  backgroundShapes: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    overflow: "hidden",
-    zIndex: 0,
-  },
-  shape1: {
-    position: "absolute",
-    width: "400px",
-    height: "400px",
-    borderRadius: "50%",
-    background: "rgba(255, 255, 255, 0.08)",
-    top: "-100px",
-    right: "-100px",
-    animation: "float 6s ease-in-out infinite",
-  },
-  shape2: {
-    position: "absolute",
-    width: "300px",
-    height: "300px",
-    borderRadius: "50%",
-    background: "rgba(255, 255, 255, 0.06)",
-    bottom: "-80px",
-    left: "-80px",
-    animation: "float 8s ease-in-out infinite 1s",
-  },
-  shape3: {
-    position: "absolute",
-    width: "200px",
-    height: "200px",
-    borderRadius: "50%",
-    background: "rgba(255, 255, 255, 0.05)",
-    top: "50%",
-    left: "10%",
-    animation: "float 7s ease-in-out infinite 2s",
-  },
-  card: {
-    width: "100%",
-    maxWidth: "420px",
-    padding: "36px 32px",
-    borderRadius: "20px",
-    background: "rgba(255, 255, 255, 0.98)",
-    backdropFilter: "blur(10px)",
-    boxShadow:
-      "0 30px 60px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.3)",
-    display: "flex",
-    flexDirection: "column",
-    gap: "16px",
-    position: "relative",
-    zIndex: 1,
-    boxSizing: "border-box",
-  },
-  iconWrapper: {
-    display: "flex",
-    justifyContent: "center",
-    marginBottom: "4px",
-  },
-  icon: {
-    width: "56px",
-    height: "56px",
-    borderRadius: "50%",
-    background: "linear-gradient(135deg, #667eea, #764ba2)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#fff",
-    boxShadow: "0 8px 20px rgba(102, 126, 234, 0.3)",
-  },
-  title: {
-    margin: 0,
-    textAlign: "center",
-    fontSize: "24px",
-    fontWeight: 700,
-    color: "#1a1a1a",
-    letterSpacing: "-0.5px",
-  },
-  subtitle: {
-    margin: "-6px 0 6px 0",
-    textAlign: "center",
-    fontSize: "14px",
-    color: "#666",
-    fontWeight: 400,
-  },
-  tabContainer: {
-    display: "flex",
-    background: "#f0f2f5",
-    borderRadius: "10px",
-    padding: "4px",
-    marginBottom: "4px",
-  },
-  tabBtn: {
-    flex: 1,
-    padding: "8px 12px",
-    borderRadius: "8px",
-    border: "none",
-    background: "transparent",
-    color: "#666",
-    fontSize: "14px",
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-  },
-  tabBtnActive: {
-    background: "#ffffff",
-    color: "#667eea",
-    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.08)",
-  },
-  errorBanner: {
-    padding: "10px 14px",
-    borderRadius: "8px",
-    background: "#fee2e2",
-    border: "1px solid #fca5a5",
-    color: "#b91c1c",
-    fontSize: "13px",
-    lineHeight: "1.4",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "14px",
-  },
-  inputWrapper: {
-    position: "relative",
-  },
-  input: {
-    width: "100%",
-    padding: "13px 16px",
-    fontSize: "14px",
-    borderRadius: "10px",
-    border: "2px solid #e8e8e8",
-    outline: "none",
-    boxSizing: "border-box",
-    transition: "all 0.3s ease",
-    background: "#fafafa",
-    fontFamily: "inherit",
-  },
-  inputFocused: {
-    border: "2px solid #667eea",
-    background: "#fff",
-    boxShadow: "0 0 0 4px rgba(102, 126, 234, 0.1)",
-  },
-  button: {
-    marginTop: "6px",
-    padding: "13px",
-    borderRadius: "10px",
-    border: "none",
-    fontSize: "15px",
-    fontWeight: 600,
-    color: "#fff",
-    background: "linear-gradient(135deg, #667eea, #764ba2)",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-    boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
-    fontFamily: "inherit",
-  },
-  footer: {
-    textAlign: "center",
-    marginTop: "2px",
-  },
-  footerText: {
-    margin: 0,
-    fontSize: "13px",
-    color: "#666",
-  },
-  link: {
-    color: "#667eea",
-    fontWeight: 600,
-    cursor: "pointer",
-    textDecoration: "underline",
-  },
-  demoSection: {
-    marginTop: "6px",
-    borderTop: "1px solid #f0f0f0",
-    paddingTop: "12px",
-    textAlign: "center",
-  },
-  demoToggle: {
-    background: "none",
-    border: "none",
-    color: "#888",
-    fontSize: "12px",
-    cursor: "pointer",
-    fontWeight: 500,
-    padding: "4px 8px",
-    borderRadius: "6px",
-    transition: "color 0.2s ease",
-  },
-  demoList: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "6px",
-    justifyContent: "center",
-    marginTop: "10px",
-  },
-  demoChip: {
-    background: "#f3f4f6",
-    border: "1px solid #e5e7eb",
-    borderRadius: "16px",
-    padding: "4px 10px",
-    fontSize: "12px",
-    color: "#374151",
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-  },
-};
-
-// Add keyframe animation via inline style tag
-if (typeof document !== "undefined") {
-  const existing = document.getElementById("login-animations");
-  if (!existing) {
-    const styleSheet = document.createElement("style");
-    styleSheet.id = "login-animations";
-    styleSheet.textContent = `
-      @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(5deg); }
-      }
-    `;
-    document.head.appendChild(styleSheet);
-  }
-}

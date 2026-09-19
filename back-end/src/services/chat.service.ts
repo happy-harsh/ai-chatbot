@@ -102,22 +102,27 @@ Standalone Search Query:`;
 export const handleMessage = async (
   from: string,
   content: string,
-  onChunk?: (chunk: string) => void
+  onChunk?: (chunk: string) => void,
+  documentName?: string
 ) => {
   const history: ChatTurn[] = conversations.get(from) ?? [];
 
   // 1. Reformulate follow-up queries using clean conversation history
   const standaloneQuery = await reformulateQuery(history, content);
 
-  // 2. Search Pinecone vector DB with the standalone query
-  const contextDocs = await searchRelevantDocs(standaloneQuery);
-  console.log("Retrieved RAG Context Docs count:", contextDocs.length);
+  // 2. Search Pinecone vector DB with the standalone query, scoped to the active document if provided
+  const contextDocs = await searchRelevantDocs(standaloneQuery, {
+    documentName: documentName || undefined,
+  });
+  console.log(
+    `Retrieved RAG Context Docs count: ${contextDocs.length} (Doc Filter: "${documentName || "None"}")`
+  );
 
-  // Keep top 3 most relevant chunks and limit context size to avoid token overflow
-  const limitedDocs = contextDocs.slice(0, 3);
+  // Keep top 4 most relevant chunks and limit context size to avoid token overflow
+  const limitedDocs = contextDocs.slice(0, 4);
   let contextText = limitedDocs.join("\n\n").trim();
-  if (contextText.length > 3000) {
-    contextText = contextText.slice(0, 3000) + "... [truncated]";
+  if (contextText.length > 3500) {
+    contextText = contextText.slice(0, 3500) + "... [truncated]";
   }
 
   // 3. Build a clean, lean prompt payload for this turn
@@ -126,12 +131,19 @@ export const handleMessage = async (
   ];
 
   if (contextText.length > 0) {
+    const docTitle = documentName ? `the attached document "${documentName}"` : "the attached document";
     promptMessages.push({
       role: "system",
-      content: `The user has uploaded documents to this chat. Here is the relevant content from the uploaded documents:\n\n${contextText}\n\nIMPORTANT INSTRUCTIONS:
+      content: `The user has attached ${docTitle} to this conversation. Here is the relevant content from ${docTitle}:
+
+${contextText}
+
+STRICT INSTRUCTIONS:
+- You are answering questions strictly and exclusively about ${docTitle}.
+- Base your answers ONLY on the provided context above. Do NOT invent, assume, or hallucinate details about other people, profiles, or previous documents.
 - The document has ALREADY been uploaded and provided above. NEVER ask the user to upload the document or PDF again.
-- If the user says "yes", "yes pls", "summarize", or asks for information, answer immediately using the uploaded document content above.
-- If the user's question cannot be answered from the document, state what is missing while referencing the document content you have.`,
+- If the user says "yes", "yes pls", "summarize", or asks for information, provide a structured, thorough, and accurate answer immediately using the uploaded document content above.
+- If the document does not mention something, explicitly state that it is not mentioned in ${docTitle}.`,
     });
   }
 

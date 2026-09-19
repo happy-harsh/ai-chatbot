@@ -17,7 +17,7 @@ export const setupChatSocket = (io: Server) => {
       console.log(`${userId} joined`);
     });
 
-    socket.on("message", async ({ from, to, content }) => {
+    socket.on("message", async ({ from, to, content, documentName }) => {
       if (to !== "bot") {
         let conversation = await Conversation.findOne({
           participants: { $all: [from, to] },
@@ -65,6 +65,7 @@ export const setupChatSocket = (io: Server) => {
           (chunk) => {
             socket.emit("message_chunk", { chunk });
           },
+          documentName
         );
 
         if (parsed.type === "message") {
@@ -172,7 +173,7 @@ export const setupChatSocket = (io: Server) => {
       }
     });
 
-    socket.on("audio_message", async ({ from, to, audioBase64, mimeType }) => {
+    socket.on("audio_message", async ({ from, to, audioBase64, mimeType, documentName }) => {
       try {
         if (!audioBase64) {
           console.warn("Audio message received with empty audioBase64");
@@ -295,7 +296,8 @@ export const setupChatSocket = (io: Server) => {
             userSpokenText,
             (chunk) => {
               socket.emit("message_chunk", { chunk });
-            }
+            },
+            documentName
           );
 
           if (parsed.type === "message") {
