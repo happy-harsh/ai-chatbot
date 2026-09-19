@@ -19,8 +19,30 @@ connectDB();
 export const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
 
-app.use(cors());
+const allowedOrigins = process.env.FRONTEND_URL
+  ? [process.env.FRONTEND_URL, "http://localhost:5173", "http://localhost:3000"]
+  : "*";
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json());
+
+// Health check endpoint for cloud deployment platforms (Render, Railway, Fly.io, AWS)
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime()),
+    environment: process.env.NODE_ENV || "development",
+  });
+});
 
 // Routes
 app.use("/login", authRoutes);

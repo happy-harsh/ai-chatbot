@@ -186,8 +186,15 @@ export async function searchRelevantDocs(
 }
 
 export function readTextFile(fileName: string) {
-  const filePath = path.join(__dirname, "../data", fileName);
-  const content = fs.readFileSync(filePath, "utf-8");
+  const p1 = path.join(__dirname, "../data", fileName);
+  const p2 = path.join(process.cwd(), "src/data", fileName);
+  const p3 = path.join(process.cwd(), "data", fileName);
 
+  const filePath = fs.existsSync(p1) ? p1 : fs.existsSync(p2) ? p2 : p3;
+  if (!fs.existsSync(filePath)) {
+    console.warn(`File "${fileName}" not found at ${filePath}`);
+    return "";
+  }
+  const content = fs.readFileSync(filePath, "utf-8");
   return content;
 }

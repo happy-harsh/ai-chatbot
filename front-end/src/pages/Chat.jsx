@@ -23,6 +23,9 @@ import {
   Settings,
   Trash2,
   Database,
+  Menu,
+  ChevronLeft,
+  ArrowLeft,
 } from "lucide-react";
 
 const AI_USER = {
@@ -309,6 +312,24 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
   const [feedback, setFeedback] = useState("");
   const [clearing, setClearing] = useState(false);
 
+  // Responsive mobile drawer state
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.innerWidth <= 768
+  );
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setShowMobileSidebar(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Clear active conversation history
   const clearCurrentChat = async () => {
     if (!activeUser || !currentUser) return;
@@ -587,11 +608,15 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
   }, [currentUser?.id]);
 
   const handleSelectUser = (user) => {
-    if (activeUser?.id === user.id) return;
+    if (activeUser?.id === user.id) {
+      if (isMobile) setShowMobileSidebar(false);
+      return;
+    }
     stopAiVoice();
     setActiveUser(user);
     localStorage.setItem("chat_active_user_id", user.id);
     loadConversationHistory(user.id);
+    if (isMobile) setShowMobileSidebar(false);
   };
 
   // Socket event listeners
@@ -1019,8 +1044,9 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
       style={{
         display: "flex",
         height: "100vh",
-        width: "100vw",
+        width: "100%",
         overflow: "hidden",
+        position: "relative",
         fontFamily:
           "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
         background: isDark ? "#09090b" : "#f4f7f5",
@@ -1028,12 +1054,28 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
       }}
     >
       {/* ============================================================ */}
-      {/* 🧭 SIDEBAR - Emerald Green & Deep Obsidian Theme             */}
+      {/* 🧭 SIDEBAR - Mobile Responsive Drawer / Desktop Sidebar     */}
       {/* ============================================================ */}
+      {/* Mobile Backdrop */}
+      {isMobile && showMobileSidebar && (
+        <div
+          onClick={() => setShowMobileSidebar(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.65)",
+            backdropFilter: "blur(4px)",
+            zIndex: 45,
+          }}
+        />
+      )}
+
       <aside
         style={{
-          width: 320,
-          minWidth: 320,
+          width: isMobile ? "85%" : 320,
+          maxWidth: isMobile ? 340 : 320,
+          minWidth: isMobile ? 0 : 320,
+          height: "100%",
           display: "flex",
           flexDirection: "column",
           borderRight: isDark ? "1px solid #1a2620" : "1px solid #e2e8f0",
@@ -1041,7 +1083,17 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
           boxShadow: isDark
             ? "4px 0 24px rgba(0, 0, 0, 0.6)"
             : "4px 0 20px rgba(0, 0, 0, 0.04)",
-          zIndex: 10,
+          position: isMobile ? "fixed" : "relative",
+          top: 0,
+          bottom: 0,
+          left: 0,
+          zIndex: isMobile ? 50 : 10,
+          transform: isMobile
+            ? showMobileSidebar
+              ? "translateX(0)"
+              : "translateX(-100%)"
+            : "none",
+          transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
         {/* User Profile Header */}
@@ -1175,6 +1227,30 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
             >
               <LogOut size={16} />
             </button>
+
+            {/* Close Mobile Sidebar Drawer */}
+            {isMobile && (
+              <button
+                type="button"
+                onClick={() => setShowMobileSidebar(false)}
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: "50%",
+                  border: isDark ? "1px solid #1e3529" : "1px solid #e2e8f0",
+                  background: isDark ? "#121b16" : "#f8fafc",
+                  color: isDark ? "#94a3b8" : "#64748b",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+                title="Close Sidebar"
+              >
+                <X size={18} />
+              </button>
+            )}
           </div>
         </div>
 
@@ -1388,7 +1464,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
         <header
           style={{
             height: 68,
-            padding: "0 24px",
+            padding: isMobile ? "0 12px" : "0 24px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -1400,17 +1476,49 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
             zIndex: 5,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: isMobile ? 8 : 14,
+              minWidth: 0,
+            }}
+          >
+            {/* Mobile Hamburger Menu Button */}
+            {isMobile && (
+              <button
+                type="button"
+                onClick={() => setShowMobileSidebar(true)}
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  border: isDark ? "1px solid #1e3529" : "1px solid #e2e8f0",
+                  background: isDark ? "#121b16" : "#f1f5f9",
+                  color: isDark ? "#34d399" : "#059669",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  flexShrink: 0,
+                }}
+                title="Open Conversations"
+              >
+                <Menu size={18} />
+              </button>
+            )}
+
             <div
               style={{
-                width: 44,
-                height: 44,
+                width: isMobile ? 38 : 44,
+                height: isMobile ? 38 : 44,
                 borderRadius: "50%",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 color: "#fff",
                 fontWeight: 700,
+                flexShrink: 0,
                 background:
                   activeUser?.id === "bot"
                     ? "linear-gradient(135deg, #10b981, #059669)"
@@ -1419,30 +1527,36 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
               }}
             >
               {activeUser?.id === "bot" ? (
-                <Bot size={22} />
+                <Bot size={isMobile ? 19 : 22} />
               ) : (
                 getInitials(activeUser?.displayName)
               )}
             </div>
 
-            <div>
+            <div style={{ minWidth: 0 }}>
               <div
                 style={{
                   fontWeight: 700,
-                  fontSize: 16,
+                  fontSize: isMobile ? 14 : 16,
                   color: isDark ? "#f8fafc" : "#0f172a",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {activeUser?.displayName || "Select Conversation"}
               </div>
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: isMobile ? 11 : 12,
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
                   marginTop: 2,
                   color: isDark ? "#94a3b8" : "#64748b",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {isTyping && activeUser?.id === "bot" ? (
@@ -1455,7 +1569,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
                       gap: 4,
                     }}
                   >
-                    <Sparkles size={13} /> Thinking & searching...
+                    <Sparkles size={13} /> {isMobile ? "Thinking..." : "Thinking & searching..."}
                   </span>
                 ) : isAiSpeaking && activeUser?.id === "bot" ? (
                   <span
@@ -1476,12 +1590,14 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
                         display: "inline-block",
                       }}
                     />
-                    Speaking aloud...
+                    {isMobile ? "Speaking..." : "Speaking aloud..."}
                   </span>
                 ) : (
                   <span>
                     {activeUser?.id === "bot"
-                      ? "Ready to search documents & answer questions"
+                      ? isMobile
+                        ? "RAG Assistant"
+                        : "Ready to search documents & answer questions"
                       : "Direct Message"}
                   </span>
                 )}
@@ -1490,7 +1606,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
           </div>
 
           {/* Action buttons */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 6 : 10, flexShrink: 0 }}>
             {activeUser?.id === "bot" && (
               <>
                 {/* Stop Voice button */}
@@ -1501,21 +1617,21 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: 6,
-                      padding: "6px 14px",
+                      gap: 4,
+                      padding: isMobile ? "6px 10px" : "6px 14px",
                       background: "#ef4444",
                       color: "#ffffff",
                       border: "none",
                       borderRadius: 20,
-                      fontSize: 13,
+                      fontSize: 12,
                       fontWeight: 700,
                       cursor: "pointer",
                       boxShadow: "0 2px 10px rgba(239, 68, 68, 0.4)",
                     }}
                     title="Stop AI voice reading immediately"
                   >
-                    <Square size={13} fill="#ffffff" />
-                    Stop Voice
+                    <Square size={12} fill="#ffffff" />
+                    {!isMobile && <span>Stop Voice</span>}
                   </button>
                 )}
 
@@ -1527,7 +1643,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
                     display: "flex",
                     alignItems: "center",
                     gap: 6,
-                    padding: "6px 14px",
+                    padding: isMobile ? "6px 10px" : "6px 14px",
                     borderRadius: 20,
                     border: isDark ? "1px solid #1e3529" : "1px solid #a7f3d0",
                     background: isVoiceMuted
@@ -1544,7 +1660,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
                       : isDark
                       ? "#6ee7b7"
                       : "#047857",
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: 600,
                     cursor: "pointer",
                   }}
@@ -1555,7 +1671,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
                   }
                 >
                   {isVoiceMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
-                  <span>{isVoiceMuted ? "Voice Muted" : "Voice On"}</span>
+                  {!isMobile && <span>{isVoiceMuted ? "Voice Muted" : "Voice On"}</span>}
                 </button>
               </>
             )}
@@ -1620,7 +1736,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
           style={{
             flex: 1,
             overflowY: "auto",
-            padding: "20px 28px",
+            padding: isMobile ? "14px 10px" : "20px 28px",
             display: "flex",
             flexDirection: "column",
             gap: 16,
@@ -1632,8 +1748,9 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
               style={{
                 margin: "auto",
                 maxWidth: 580,
+                width: "100%",
                 textAlign: "center",
-                padding: 32,
+                padding: isMobile ? "24px 14px" : 32,
                 borderRadius: 20,
                 background: isDark ? "#0f1612" : "#ffffff",
                 border: isDark ? "1px solid #1e3529" : "1px solid #a7f3d0",
@@ -1660,7 +1777,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
               </div>
               <h2
                 style={{
-                  fontSize: 22,
+                  fontSize: isMobile ? 19 : 22,
                   fontWeight: 800,
                   margin: "0 0 8px",
                   color: isDark ? "#f8fafc" : "#0f172a",
@@ -1670,7 +1787,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
               </h2>
               <p
                 style={{
-                  fontSize: 14,
+                  fontSize: isMobile ? 13 : 14,
                   color: isDark ? "#94a3b8" : "#64748b",
                   margin: "0 0 24px",
                   lineHeight: 1.5,
@@ -1683,7 +1800,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
+                  gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
                   gap: 12,
                   textAlign: "left",
                 }}
@@ -1821,7 +1938,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
 
                 <div
                   style={{
-                    maxWidth: "75%",
+                    maxWidth: isMobile ? "90%" : "75%",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: isMe ? "flex-end" : "flex-start",
@@ -1847,7 +1964,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
 
                   <div
                     style={{
-                      padding: "12px 18px",
+                      padding: isMobile ? "10px 14px" : "12px 18px",
                       borderRadius: isMe
                         ? "18px 18px 4px 18px"
                         : "18px 18px 18px 4px",
@@ -1869,7 +1986,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
                         : isDark
                         ? "1px solid #1c2b23"
                         : "1px solid #e2e8f0",
-                      fontSize: 14,
+                      fontSize: isMobile ? 13 : 14,
                       wordBreak: "break-word",
                     }}
                   >
@@ -1880,7 +1997,8 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
                           src={m.audio}
                           style={{
                             display: "block",
-                            width: 240,
+                            width: "100%",
+                            maxWidth: 240,
                             height: 38,
                             borderRadius: 8,
                           }}
@@ -1949,11 +2067,12 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
         {activeUser?.id === "bot" && (
           <div
             style={{
-              padding: "0 28px 8px",
+              padding: isMobile ? "0 10px 8px" : "0 28px 8px",
               display: "flex",
               alignItems: "center",
               gap: 8,
               overflowX: "auto",
+              scrollbarWidth: "none",
             }}
           >
             <button
@@ -2053,7 +2172,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
                 border: isDark ? "1px solid #1e3529" : "1px solid #a7f3d0",
               }}
             >
-              🤝 Delegate Task Example
+              🤝 Delegate Task
             </button>
           </div>
         )}
@@ -2062,8 +2181,8 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
         {activeUser?.id === "bot" && isAiSpeaking && (
           <div
             style={{
-              margin: "0 28px 10px",
-              padding: "8px 16px",
+              margin: isMobile ? "0 10px 8px" : "0 28px 10px",
+              padding: isMobile ? "8px 12px" : "8px 16px",
               borderRadius: 12,
               display: "flex",
               alignItems: "center",
@@ -2078,13 +2197,13 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
-                fontSize: 13,
+                fontSize: isMobile ? 12 : 13,
                 fontWeight: 600,
                 color: isDark ? "#a7f3d0" : "#047857",
               }}
             >
               <Volume2 size={16} />
-              <span>AI is reading its answer out loud...</span>
+              <span>{isMobile ? "AI speaking aloud..." : "AI is reading its answer out loud..."}</span>
             </div>
             <button
               type="button"
@@ -2104,7 +2223,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
               }}
             >
               <Square size={12} fill="#ffffff" />
-              Stop Voice
+              Stop
             </button>
           </div>
         )}
@@ -2112,7 +2231,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
         {/* Input Bar Dock */}
         <div
           style={{
-            padding: "0 28px 24px",
+            padding: isMobile ? "0 10px 14px" : "0 28px 24px",
           }}
         >
           {/* ChatGPT-Style Active Document Attachment Chip */}
@@ -2125,6 +2244,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
                 padding: "6px 14px",
                 marginBottom: 10,
                 borderRadius: 14,
+                maxWidth: isMobile ? "100%" : "auto",
                 background: isDark ? "#06281c" : "#ecfdf5",
                 border: isDark ? "1px solid #10b98155" : "1px solid #a7f3d0",
                 boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
@@ -2324,7 +2444,9 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
                 onKeyDown={handleKeyDown}
                 placeholder={
                   activeUser?.id === "bot"
-                    ? "Ask a question about the document, or delegate a task..."
+                    ? isMobile
+                      ? "Ask about document, or delegate..."
+                      : "Ask a question about the document, or delegate a task..."
                     : `Message ${activeUser?.displayName || ""}...`
                 }
                 style={{
@@ -2412,7 +2534,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
             alignItems: "center",
             justifyContent: "center",
             zIndex: 1000,
-            padding: 20,
+            padding: isMobile ? 12 : 20,
           }}
           onClick={() => setShowSettings(false)}
         >
@@ -2421,14 +2543,15 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
             style={{
               width: "100%",
               maxWidth: 520,
+              maxHeight: "90vh",
+              overflowY: "auto",
               background: isDark ? "#0f1612" : "#ffffff",
               border: isDark ? "1px solid #1e3529" : "1px solid #e2e8f0",
               borderRadius: 20,
               boxShadow:
                 "0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(16, 185, 129, 0.1)",
-              padding: "24px 28px",
+              padding: isMobile ? "20px 16px" : "24px 28px",
               position: "relative",
-              overflow: "hidden",
             }}
           >
             {/* Header */}

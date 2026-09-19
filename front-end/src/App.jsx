@@ -21,11 +21,22 @@ const App = () => {
 
   useEffect(() => {
     if (currentUser) {
-      const newSocket = io(API_URL);
+      const newSocket = io(API_URL, {
+        transports: ["websocket", "polling"],
+        reconnectionAttempts: 10,
+        reconnectionDelay: 1000,
+        timeout: 20000,
+      });
+
       newSocket.on("connect", () => {
         console.log("Socket connected:", newSocket.id);
         newSocket.emit("join", currentUser.id);
       });
+
+      newSocket.on("connect_error", (err) => {
+        console.warn("Socket connection warning:", err.message);
+      });
+
       setSocket(newSocket);
       setIsInitializing(false);
 

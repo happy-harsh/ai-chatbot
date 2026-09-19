@@ -172,19 +172,19 @@ export const Login = ({ setCurrentUser, setSocket }) => {
     <div
       style={{
         minHeight: "100vh",
-        width: "100vw",
+        width: "100%",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#09090b",
+        background: "#f8fafc",
         backgroundImage: `
-          radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
-          radial-gradient(circle at 80% 80%, rgba(5, 150, 105, 0.08) 0%, transparent 50%)
+          radial-gradient(circle at 50% 15%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+          radial-gradient(circle at 80% 80%, rgba(5, 150, 105, 0.05) 0%, transparent 50%)
         `,
         fontFamily:
           "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-        color: "#f8fafc",
-        padding: "20px",
+        color: "#0f172a",
+        padding: "16px",
         boxSizing: "border-box",
       }}
     >
@@ -192,32 +192,32 @@ export const Login = ({ setCurrentUser, setSocket }) => {
         style={{
           width: "100%",
           maxWidth: 440,
-          background: "#111413",
-          border: "1px solid #1e2e26",
+          background: "#ffffff",
+          border: "1px solid #e2e8f0",
           borderRadius: 20,
           boxShadow:
-            "0 20px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(16, 185, 129, 0.08)",
-          padding: "36px 32px",
+            "0 20px 45px rgba(0, 0, 0, 0.06), 0 2px 10px rgba(0, 0, 0, 0.03)",
+          padding: "clamp(24px, 5vw, 36px) clamp(18px, 5vw, 32px)",
           boxSizing: "border-box",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Ambient Top Glow Line */}
+        {/* Ambient Top Emerald Accent Line */}
         <div
           style={{
             position: "absolute",
             top: 0,
-            left: "15%",
-            right: "15%",
-            height: 2,
+            left: 0,
+            right: 0,
+            height: 3,
             background:
-              "linear-gradient(90deg, transparent, #10b981, transparent)",
+              "linear-gradient(90deg, #059669, #10b981, #34d399)",
           }}
         />
 
         {/* Brand Header */}
-        <div style={{ textAlign: "center", marginBottom: 28 }}>
+        <div style={{ textAlign: "center", marginBottom: 28, marginTop: 4 }}>
           <div
             style={{
               width: 58,
@@ -229,7 +229,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
               alignItems: "center",
               justifyContent: "center",
               margin: "0 auto 16px",
-              boxShadow: "0 8px 24px rgba(16, 185, 129, 0.35)",
+              boxShadow: "0 8px 24px rgba(16, 185, 129, 0.28)",
             }}
           >
             <Bot size={30} />
@@ -238,7 +238,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
             style={{
               fontSize: 22,
               fontWeight: 800,
-              color: "#f8fafc",
+              color: "#0f172a",
               margin: "0 0 6px",
               letterSpacing: "-0.02em",
             }}
@@ -248,7 +248,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
           <p
             style={{
               fontSize: 13,
-              color: "#94a3b8",
+              color: "#64748b",
               margin: 0,
               display: "flex",
               alignItems: "center",
@@ -256,7 +256,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
               gap: 6,
             }}
           >
-            <Sparkles size={14} color="#10b981" />
+            <Sparkles size={14} color="#059669" />
             <span>Voice & Document Intelligence</span>
           </p>
         </div>
@@ -265,8 +265,8 @@ export const Login = ({ setCurrentUser, setSocket }) => {
         <div
           style={{
             display: "flex",
-            background: "#090d0b",
-            border: "1px solid #1b2821",
+            background: "#f1f5f9",
+            border: "1px solid #e2e8f0",
             borderRadius: 12,
             padding: 4,
             marginBottom: 24,
@@ -287,10 +287,10 @@ export const Login = ({ setCurrentUser, setSocket }) => {
               fontWeight: 700,
               cursor: "pointer",
               transition: "all 0.2s ease",
-              background: !isRegister ? "#10b981" : "transparent",
-              color: !isRegister ? "#022c22" : "#94a3b8",
+              background: !isRegister ? "#ffffff" : "transparent",
+              color: !isRegister ? "#065f46" : "#64748b",
               boxShadow: !isRegister
-                ? "0 2px 10px rgba(16, 185, 129, 0.3)"
+                ? "0 2px 8px rgba(0, 0, 0, 0.08)"
                 : "none",
             }}
           >
@@ -311,10 +311,10 @@ export const Login = ({ setCurrentUser, setSocket }) => {
               fontWeight: 700,
               cursor: "pointer",
               transition: "all 0.2s ease",
-              background: isRegister ? "#10b981" : "transparent",
-              color: isRegister ? "#022c22" : "#94a3b8",
+              background: isRegister ? "#ffffff" : "transparent",
+              color: isRegister ? "#065f46" : "#64748b",
               boxShadow: isRegister
-                ? "0 2px 10px rgba(16, 185, 129, 0.3)"
+                ? "0 2px 8px rgba(0, 0, 0, 0.08)"
                 : "none",
             }}
           >
@@ -331,9 +331,9 @@ export const Login = ({ setCurrentUser, setSocket }) => {
               gap: 8,
               padding: "10px 14px",
               borderRadius: 10,
-              background: "#450a0a",
-              border: "1px solid #7f1d1d",
-              color: "#fca5a5",
+              background: "#fef2f2",
+              border: "1px solid #fecaca",
+              color: "#991b1b",
               fontSize: 12,
               fontWeight: 600,
               marginBottom: 20,
@@ -352,8 +352,8 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                 style={{
                   display: "block",
                   fontSize: 12,
-                  fontWeight: 600,
-                  color: "#cbd5e1",
+                  fontWeight: 700,
+                  color: "#334155",
                   marginBottom: 6,
                 }}
               >
@@ -364,13 +364,13 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                   display: "flex",
                   alignItems: "center",
                   gap: 10,
-                  background: "#090d0b",
-                  border: "1px solid #1f2d26",
+                  background: "#f8fafc",
+                  border: "1px solid #cbd5e1",
                   borderRadius: 10,
                   padding: "10px 12px",
                 }}
               >
-                <User size={16} color="#10b981" />
+                <User size={16} color="#059669" />
                 <input
                   type="text"
                   placeholder="e.g. Harsh Dodiya"
@@ -381,7 +381,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                     border: "none",
                     background: "transparent",
                     outline: "none",
-                    color: "#f8fafc",
+                    color: "#0f172a",
                     fontSize: 14,
                   }}
                 />
@@ -394,8 +394,8 @@ export const Login = ({ setCurrentUser, setSocket }) => {
               style={{
                 display: "block",
                 fontSize: 12,
-                fontWeight: 600,
-                color: "#cbd5e1",
+                fontWeight: 700,
+                color: "#334155",
                 marginBottom: 6,
               }}
             >
@@ -406,13 +406,13 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                 display: "flex",
                 alignItems: "center",
                 gap: 10,
-                background: "#090d0b",
-                border: "1px solid #1f2d26",
+                background: "#f8fafc",
+                border: "1px solid #cbd5e1",
                 borderRadius: 10,
                 padding: "10px 12px",
               }}
             >
-              <User size={16} color="#10b981" />
+              <User size={16} color="#059669" />
               <input
                 type="text"
                 placeholder="Enter username"
@@ -424,7 +424,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                   border: "none",
                   background: "transparent",
                   outline: "none",
-                  color: "#f8fafc",
+                  color: "#0f172a",
                   fontSize: 14,
                 }}
               />
@@ -436,8 +436,8 @@ export const Login = ({ setCurrentUser, setSocket }) => {
               style={{
                 display: "block",
                 fontSize: 12,
-                fontWeight: 600,
-                color: "#cbd5e1",
+                fontWeight: 700,
+                color: "#334155",
                 marginBottom: 6,
               }}
             >
@@ -448,13 +448,13 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                 display: "flex",
                 alignItems: "center",
                 gap: 10,
-                background: "#090d0b",
-                border: "1px solid #1f2d26",
+                background: "#f8fafc",
+                border: "1px solid #cbd5e1",
                 borderRadius: 10,
                 padding: "10px 12px",
               }}
             >
-              <Lock size={16} color="#10b981" />
+              <Lock size={16} color="#059669" />
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter password"
@@ -465,7 +465,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                   border: "none",
                   background: "transparent",
                   outline: "none",
-                  color: "#f8fafc",
+                  color: "#0f172a",
                   fontSize: 14,
                 }}
               />
@@ -493,8 +493,8 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                 style={{
                   display: "block",
                   fontSize: 12,
-                  fontWeight: 600,
-                  color: "#cbd5e1",
+                  fontWeight: 700,
+                  color: "#334155",
                   marginBottom: 6,
                 }}
               >
@@ -505,13 +505,13 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                   display: "flex",
                   alignItems: "center",
                   gap: 10,
-                  background: "#090d0b",
-                  border: "1px solid #1f2d26",
+                  background: "#f8fafc",
+                  border: "1px solid #cbd5e1",
                   borderRadius: 10,
                   padding: "10px 12px",
                 }}
               >
-                <ShieldCheck size={16} color="#10b981" />
+                <ShieldCheck size={16} color="#059669" />
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Repeat password"
@@ -522,7 +522,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                     border: "none",
                     background: "transparent",
                     outline: "none",
-                    color: "#f8fafc",
+                    color: "#0f172a",
                     fontSize: 14,
                   }}
                 />
@@ -540,7 +540,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
               borderRadius: 10,
               border: "none",
               background: "linear-gradient(135deg, #10b981, #059669)",
-              color: "#022c22",
+              color: "#ffffff",
               fontSize: 14,
               fontWeight: 800,
               display: "flex",
@@ -548,8 +548,8 @@ export const Login = ({ setCurrentUser, setSocket }) => {
               justifyContent: "center",
               gap: 8,
               cursor: loading ? "not-allowed" : "pointer",
-              boxShadow: "0 4px 18px rgba(16, 185, 129, 0.4)",
-              transition: "transform 0.15s ease",
+              boxShadow: "0 4px 14px rgba(16, 185, 129, 0.35)",
+              transition: "all 0.15s ease",
             }}
           >
             {loading ? (
@@ -565,7 +565,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
 
         {/* Demo Fast Login Chips */}
         {!isRegister && (
-          <div style={{ marginTop: 28, paddingTop: 20, borderTop: "1px solid #1b2821" }}>
+          <div style={{ marginTop: 28, paddingTop: 20, borderTop: "1px solid #f1f5f9" }}>
             <div
               style={{
                 fontSize: 11,
@@ -581,7 +581,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                 gap: 6,
               }}
             >
-              <Zap size={12} color="#10b981" />
+              <Zap size={12} color="#059669" />
               <span>1-Click Demo Accounts</span>
             </div>
             <div
@@ -597,13 +597,13 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                   type="button"
                   onClick={() => handleDemoLogin(acc)}
                   style={{
-                    padding: "8px 10px",
+                    padding: "9px 12px",
                     borderRadius: 8,
-                    border: "1px solid #1e2e26",
-                    background: "#090d0b",
-                    color: "#a7f3d0",
+                    border: "1px solid #e2e8f0",
+                    background: "#f8fafc",
+                    color: "#065f46",
                     fontSize: 12,
-                    fontWeight: 600,
+                    fontWeight: 700,
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
@@ -613,14 +613,14 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = "#10b981";
-                    e.currentTarget.style.background = "#052e16";
+                    e.currentTarget.style.background = "#ecfdf5";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "#1e2e26";
-                    e.currentTarget.style.background = "#090d0b";
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.background = "#f8fafc";
                   }}
                 >
-                  <Users size={12} color="#10b981" />
+                  <Users size={13} color="#059669" />
                   <span>{acc.label}</span>
                 </button>
               ))}
