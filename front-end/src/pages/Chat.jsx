@@ -2154,7 +2154,7 @@ export const Chat = ({ currentUser, socket, onLogout }) => {
               type="button"
               onClick={() =>
                 handleQuickPrompt(
-                  "Assign a task to Savan to review the project by tomorrow."
+                  "Assign a task to Test User to review the project by tomorrow."
                 )
               }
               style={{

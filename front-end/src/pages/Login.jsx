@@ -30,8 +30,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
   const navigate = useNavigate();
 
   const demoAccounts = [
-    { username: "harsh", password: "1", label: "Harsh" },
-    { username: "savan", password: "1", label: "Savan" },
+    { username: "test", password: "1", label: "Test Account" },
   ];
 
   const handleDemoLogin = async (acc) => {
@@ -373,7 +372,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
                 <User size={16} color="#059669" />
                 <input
                   type="text"
-                  placeholder="e.g. Harsh Dodiya"
+                  placeholder="e.g. Alex Morgan"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   style={{
@@ -587,7 +586,7 @@ export const Login = ({ setCurrentUser, setSocket }) => {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr",
+                gridTemplateColumns: demoAccounts.length > 1 ? "1fr 1fr" : "1fr",
                 gap: 8,
               }}
             >

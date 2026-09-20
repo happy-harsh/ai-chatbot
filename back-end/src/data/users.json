@@ -1,14 +1,8 @@
 [
   {
     "id": "u1",
-    "username": "savan",
+    "username": "test",
     "password": "1",
-    "displayName": "SAVAN"
-  },
-  {
-    "id": "u2",
-    "username": "harsh",
-    "password": "1",
-    "displayName": "HARSH"
+    "displayName": "Test User"
   }
 ]

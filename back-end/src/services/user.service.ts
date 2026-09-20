@@ -10,8 +10,7 @@ export interface User {
 }
 
 const DEFAULT_USERS: User[] = [
-  { id: "u1", username: "savan", password: "1", displayName: "SAVAN" },
-  { id: "u2", username: "harsh", password: "1", displayName: "HARSH" },
+  { id: "u1", username: "test", password: "1", displayName: "Test User" },
 ];
 
 function resolveUsersFile(): string {
